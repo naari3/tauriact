@@ -1,4 +1,5 @@
 import React from "react";
+import { open, setTitle } from "tauri/api/window";
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -11,6 +12,15 @@ const App: React.FC = () => {
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
         <p>also hello tauriact</p>
+        <button
+          type="button"
+          onClick={(): void => {
+            open("http://example.com");
+            setTitle("asd");
+          }}
+        >
+          aaa
+        </button>
         <a
           className="App-link"
           href="https://reactjs.org"
