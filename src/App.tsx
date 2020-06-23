@@ -3,6 +3,12 @@ import { open, setTitle } from "tauri/api/window";
 import logo from "./logo.svg";
 import "./App.css";
 
+declare global {
+  interface Window {
+    invoke: (cmd: string) => void;
+  }
+}
+
 const App: React.FC = () => {
   return (
     <div className="App">
@@ -15,8 +21,12 @@ const App: React.FC = () => {
         <button
           type="button"
           onClick={(): void => {
-            open("http://example.com");
-            setTitle("asd");
+            window.invoke(
+              JSON.stringify({
+                cmd: "myCustomCommand",
+                argument: "",
+              })
+            );
           }}
         >
           aaa
