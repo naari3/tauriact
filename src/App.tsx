@@ -1,13 +1,8 @@
 import React from "react";
-import { open, setTitle } from "tauri/api/window";
+import { open } from "tauri/api/dialog";
 import logo from "./logo.svg";
 import "./App.css";
-
-declare global {
-  interface Window {
-    invoke: (cmd: string) => void;
-  }
-}
+import API from "./tauriAPI";
 
 const App: React.FC = () => {
   return (
@@ -20,25 +15,13 @@ const App: React.FC = () => {
         <p>also hello tauriact</p>
         <button
           type="button"
-          onClick={(): void => {
-            window.invoke(
-              JSON.stringify({
-                cmd: "myCustomCommand",
-                argument: "",
-              })
-            );
+          onClick={async (): Promise<void> => {
+            const path = await open();
+            console.log(await API.getTweetCount({ path }));
           }}
         >
-          aaa
+          bbb
         </button>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
     </div>
   );

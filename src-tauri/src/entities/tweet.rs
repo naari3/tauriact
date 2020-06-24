@@ -3,6 +3,8 @@ use serde::Deserialize;
 use serde::de::{self, Deserializer, Visitor};
 use std::fmt;
 
+use chrono::{DateTime, FixedOffset};
+
 #[derive(Debug)]
 pub struct StrToInt(pub i64);
 
@@ -17,7 +19,7 @@ impl<'de> Deserialize<'de> for StrToInt {
       type Value = StrToInt;
 
       fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("user ID as a number or string")
+        f.write_str("ID as a number or string")
       }
 
       fn visit_i64<E>(self, id: i64) -> Result<Self::Value, E>
@@ -39,6 +41,39 @@ impl<'de> Deserialize<'de> for StrToInt {
   }
 }
 
+#[derive(Debug)]
+pub struct StrToDateTime(pub DateTime<FixedOffset>);
+
+impl<'de> Deserialize<'de> for StrToDateTime {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    struct DateTimeVisitor;
+
+    impl<'de> Visitor<'de> for DateTimeVisitor {
+      type Value = StrToDateTime;
+
+      fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("DateTIme as a datetime")
+      }
+
+      fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+      where
+        E: de::Error,
+      {
+        // "Wed Jun 17 13:10:43 +0000 2020"
+        match DateTime::parse_from_str(value, "%a %b %d %T %z %Y") {
+          Ok(ndt) => Ok(StrToDateTime(ndt)),
+          Err(e) => Err(E::custom(format!("Parse error {} for {}", e, value))),
+        }
+      }
+    }
+
+    deserializer.deserialize_any(DateTimeVisitor)
+  }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Tweet {
   pub tweet: TweetBody,
@@ -54,7 +89,7 @@ pub struct TweetBody {
   pub id: StrToInt,
   pub id_str: String,
   pub truncated: bool,
-  pub created_at: String,
+  pub created_at: StrToDateTime,
   pub favorited: bool,
   pub full_text: String,
   pub lang: String,

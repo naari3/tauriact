@@ -21,11 +21,13 @@ fn main() {
             MyCustomCommand { argument } => {
               //  your command code
               println!("{}", argument);
-              let mut test = fs::read_to_string("/mnt/c/Users/naari/Downloads/tweet.js").unwrap();
+            }
+            GetTweetCount { path, callback } => {
+              let mut test = fs::read_to_string(path).unwrap();
               test = test[25..].to_string();
-              let tweets: Vec<Tweet> = serde_json::from_str(&test).unwrap();
-              let ids: Vec<_> = tweets.iter().map(|t| t.tweet.id.0).collect();
-              dbg!(ids);
+              let mut tweets: Vec<Tweet> = serde_json::from_str(&test).unwrap();
+              tweets.sort_by_key(|a| a.tweet.created_at.0);
+              _webview.eval(&format!("window[\"{}\"]({:?})", callback, tweets.len())).unwrap();
             }
           }
           Ok(())

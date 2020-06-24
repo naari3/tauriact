@@ -1,4 +1,4 @@
-declare module "tauri/api/window" {
-  export function open(url: string): void;
-  export function setTitle(title: string): void;
+declare module "tauri/api/dialog" {
+  export function open(options = {}): Promise<string>;
+  export function save(options = {}): Promise<string>;
 }
