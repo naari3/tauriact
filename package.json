@@ -15,7 +15,7 @@
     "react-redux": "^7.2.0",
     "react-scripts": "3.4.1",
     "reselect": "^4.0.0",
-    "tauri": "^0.6.3",
+    "tauri": "^0.7.0",
     "typescript": "^3.7.5",
     "typescript-fsa": "^3.0.0"
   },
