@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize, Serializer};
 
 use serde::de::{self, Deserializer, Visitor};
 use std::fmt;
@@ -41,6 +41,15 @@ impl<'de> Deserialize<'de> for StrToInt {
   }
 }
 
+impl Serialize for StrToInt {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    serializer.serialize_i32(self.0 as i32)
+  }
+}
+
 #[derive(Debug)]
 pub struct StrToDateTime(pub DateTime<FixedOffset>);
 
@@ -74,12 +83,21 @@ impl<'de> Deserialize<'de> for StrToDateTime {
   }
 }
 
-#[derive(Deserialize, Debug)]
+impl Serialize for StrToDateTime {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    serializer.serialize_str(&self.0.to_rfc3339())
+  }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Tweet {
   pub tweet: TweetBody,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct TweetBody {
   pub retweeted: bool,
   pub source: String,
@@ -104,7 +122,7 @@ pub struct TweetBody {
   pub withheld_copyright: Option<bool>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Entities {
   pub hashtags: Option<Vec<Hashtag>>,
   pub symbols: Option<Vec<Symbol>>,
@@ -113,19 +131,19 @@ pub struct Entities {
   pub urls: Option<Vec<Url>>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Hashtag {
   pub text: String,
   pub indices: Vec<StrToInt>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Symbol {
   pub text: String,
   pub indices: Vec<StrToInt>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct UserMention {
   pub screen_name: String,
   pub name: String,
@@ -134,7 +152,7 @@ pub struct UserMention {
   pub indices: Vec<StrToInt>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Media {
   pub display_url: String,
   pub expanded_url: String,
@@ -151,7 +169,7 @@ pub struct Media {
   pub url: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Url {
   pub url: String,
   pub expanded_url: String,
@@ -159,14 +177,14 @@ pub struct Url {
   pub indices: Vec<StrToInt>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Poll {
   pub options: Vec<PollOption>,
   pub end_datetime: String,
   pub duration_minutes: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Sizes {
   pub thumb: Option<Size>,
   pub large: Option<Size>,
@@ -174,14 +192,14 @@ pub struct Sizes {
   pub medium: Option<Size>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Size {
   pub w: StrToInt,
   pub h: StrToInt,
   pub resize: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct PollOption {
   pub position: i32,
   pub text: String,
